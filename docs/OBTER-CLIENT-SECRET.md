@@ -8,17 +8,17 @@ https://console.cloud.google.com/apis/credentials?project=fila-digital-qa
 ```
 
 ### 2. Localize sua Credencial OAuth 2.0
-- Procure por: `397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com`
+- Procure por: `YOUR_CLIENT_ID.apps.googleusercontent.com`
 - Tipo: "Web client"
 
 ### 3. Clique no Nome da Credencial
 - Clique no nome/ícone de edição da credencial
 - Você verá:
-  - ✅ **Client ID**: `397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com`
-  - 🔑 **Client Secret**: `GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxxx`
+  - ✅ **Client ID**: `YOUR_CLIENT_ID.apps.googleusercontent.com`
+  - 🔑 **Client Secret**: `YOUR_CLIENT_SECRET`
 
 ### 4. Copie o Client Secret
-- Copie o valor que começa com `GOCSPX-`
+- Copie o valor que começa com `YOUR_CLIENT_SECRET`
 - **NUNCA** compartilhe este valor publicamente
 
 ## 🔧 Método Alternativo: Download JSON
@@ -32,8 +32,8 @@ https://console.cloud.google.com/apis/credentials?project=fila-digital-qa
 ```json
 {
   "web": {
-    "client_id": "397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com",
-    "client_secret": "GOCSPX-seu-client-secret-aqui",
+    "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+    "client_secret": "YOUR_CLIENT_SECRET",
     "project_id": "fila-digital-qa",
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
     "token_uri": "https://oauth2.googleapis.com/token",
@@ -53,7 +53,7 @@ https://console.cloud.google.com/apis/credentials?project=fila-digital-qa
 Após obter o client secret, adicione no arquivo `.env` da API:
 
 ```bash
-GOOGLE_CLIENT_SECRET=GOCSPX-seu-client-secret-aqui
+GOOGLE_CLIENT_SECRET=YOUR_CLIENT_SECRET
 ```
 
 ## 📱 Link Direto

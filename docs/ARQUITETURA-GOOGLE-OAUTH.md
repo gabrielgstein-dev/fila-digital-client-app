@@ -101,7 +101,7 @@ IOS_CLIENT_ID: 'xxx-ios.apps.googleusercontent.com'
 ```bash
 # .env
 GOOGLE_CLIENT_ID=xxx-web.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-web-client-secret
+GOOGLE_CLIENT_SECRET=YOUR_CLIENT_SECRET
 ```
 
 ## 🚀 Vantagens

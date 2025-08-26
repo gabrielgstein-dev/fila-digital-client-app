@@ -47,7 +47,7 @@
 ```json
 {
   "android": {
-    "client_id": "397713505626-ANDROID-ID.apps.googleusercontent.com"
+    "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com"
   }
 }
 ```
@@ -110,10 +110,10 @@ Retorna: JWT da nossa aplicação
 
 ```typescript
 // ❌ ATUAL (ERRADO)
-ANDROID_CLIENT_ID: '397713505626-791te1oun0q2ij37jfm9upbekpvmppfu.apps.googleusercontent.com' // WEB
+ANDROID_CLIENT_ID: 'YOUR_CLIENT_ID.apps.googleusercontent.com' // WEB
 
 // ✅ DEVERIA SER
-ANDROID_CLIENT_ID: '397713505626-ANDROID-SPECIFIC-ID.apps.googleusercontent.com' // ANDROID
+ANDROID_CLIENT_ID: 'YOUR_CLIENT_ID.apps.googleusercontent.com' // ANDROID
 ```
 
 ## 🔄 Próximas Ações

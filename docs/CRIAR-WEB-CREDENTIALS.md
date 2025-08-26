@@ -34,8 +34,8 @@ Você receberá um JSON assim:
 ```json
 {
   "web": {
-    "client_id": "397713505626-NOVO-ID.apps.googleusercontent.com",
-    "client_secret": "GOCSPX-seu-client-secret-aqui",
+    "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+    "client_secret": "YOUR_CLIENT_SECRET",
     "project_id": "fila-digital-qa",
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
     "token_uri": "https://oauth2.googleapis.com/token",
@@ -64,7 +64,7 @@ WEB_CLIENT_ID: 'SEU-NOVO-WEB-CLIENT-ID'
 **2. API Backend (`.env`):**
 ```bash
 GOOGLE_CLIENT_ID=SEU-NOVO-WEB-CLIENT-ID
-GOOGLE_CLIENT_SECRET=GOCSPX-seu-client-secret
+GOOGLE_CLIENT_SECRET=YOUR_CLIENT_SECRET
 ```
 
 ## 📱 Link Direto para Criar
@@ -78,6 +78,6 @@ echo "NOVO_CLIENT_ID=seu-novo-id" > temp-config.txt
 
 # Atualizar API backend  
 cd ../fila-api
-echo "GOOGLE_CLIENT_SECRET=GOCSPX-seu-secret" >> .env
+echo "GOOGLE_CLIENT_SECRET=YOUR_CLIENT_SECRET" >> .env
 ```
 

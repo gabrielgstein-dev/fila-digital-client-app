@@ -3,13 +3,13 @@ import { Platform } from 'react-native';
 // Configure these values for your Google OAuth setup
 export const GOOGLE_OAUTH_CONFIG = {
   // Web Client ID (from Google Cloud Console) - usado apenas para referência
-  WEB_CLIENT_ID: '397713505626-791te1oun0q2ij37jfm9upbekpvmppfu.apps.googleusercontent.com',
+  WEB_CLIENT_ID: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
   
   // iOS Client ID (from Google Cloud Console) - pode usar o Installed temporariamente
-  IOS_CLIENT_ID: '397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com',
+  IOS_CLIENT_ID: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
   
   // Android Client ID (from Google Cloud Console) - credencial "installed" 
-  ANDROID_CLIENT_ID: '397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com',
+  ANDROID_CLIENT_ID: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com',
   
   // Get the appropriate client ID for the current platform
   getClientId(): string {
@@ -26,7 +26,7 @@ export const GOOGLE_OAUTH_CONFIG = {
   // Check if Google OAuth is properly configured
   isConfigured(): boolean {
     const clientId = this.getClientId();
-    return clientId && !clientId.includes('YOUR_');
+    return Boolean(clientId && !clientId.includes('YOUR_'));
   }
 };
 
