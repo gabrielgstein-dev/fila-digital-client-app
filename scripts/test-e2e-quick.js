@@ -67,7 +67,7 @@ async function quickE2ETest() {
     if (fs.existsSync(apiEnvPath)) {
       const envContent = fs.readFileSync(apiEnvPath, 'utf8');
       
-      if (envContent.includes('GOOGLE_CLIENT_SECRET=GOCSPX-')) {
+      if (envContent.includes('GOOGLE_CLIENT_SECRET=YOUR_CLIENT_SECRET')) {
         console.log('✅ Client Secret configurado na API');
       } else {
         console.log('❌ Client Secret não encontrado na API');

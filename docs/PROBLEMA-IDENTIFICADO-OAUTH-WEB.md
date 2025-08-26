@@ -6,7 +6,7 @@
 ```
 🚀 Iniciando login com Google...
 🔍 Configuração atual: {
-  clientId: 397713505626-791te1oun0q2ij37jfm9upbekpvmppfu.apps.googleusercontent.com, 
+  clientId: YOUR_CLIENT_ID.apps.googleusercontent.com, 
   redirectUri: http://localhost:8081/auth, 
   configured: true
 }

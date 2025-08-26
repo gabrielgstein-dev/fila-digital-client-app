@@ -211,7 +211,7 @@ test.describe('Google OAuth - Comunicação Real com API', () => {
       
       // Verificar se está usando as credenciais corretas
       const hasCorrectClientId = consoleLogs.some(log => 
-        log.includes('397713505626-483v2vp5uao65ac95cr10jtp7ka2qgkp.apps.googleusercontent.com')
+        log.includes('YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com')
       );
       expect(hasCorrectClientId).toBeTruthy();
       
