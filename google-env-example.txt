@@ -1,0 +1,11 @@
+# Google OAuth Configuration - Demo
+# Configurações de demonstração para Google OAuth
+# Copie este conteúdo para ../fila-api/.env (adicione ao arquivo existente)
+
+GOOGLE_CLIENT_ID=397713505626-demo-web.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=DEMO_SECRET_FOR_TESTING
+GOOGLE_CALLBACK_URL=http://localhost:3001/api/v1/auth/google/callback
+
+# Project Info
+GOOGLE_PROJECT_ID=fila-digital-qa
+GOOGLE_PROJECT_NAME=fila-digital
