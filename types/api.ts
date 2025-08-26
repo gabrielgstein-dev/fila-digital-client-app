@@ -87,3 +87,33 @@ export interface ApiResponse<T = any> {
   data: T;
   message?: string;
 }
+
+export interface UserQueue {
+  id: string;
+  name: string;
+  description?: string;
+  tenant: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  tickets: Array<{
+    id: string;
+    number: number;
+    status: string;
+    createdAt: string;
+    validatedAt?: string;
+    token: string;
+  }>;
+}
+
+export interface UserQueuesData {
+  client: {
+    identifier: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    userType: string;
+  };
+  queues: UserQueue[];
+}

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ClientDashboard, Ticket, CreateTicketDto, Queue } from '../types/api';
+import { ClientDashboard, Ticket, CreateTicketDto, Queue, UserQueuesData } from '../types/api';
 import { environmentService } from '../config/environment';
 
 const API_BASE_URL = environmentService.getApiBaseUrl();
@@ -80,6 +80,11 @@ class ApiService {
 
   async getQueuesByTenant(tenantId: string): Promise<Queue[]> {
     const response = await this.api.get(`/tenants/${tenantId}/queues`);
+    return response.data;
+  }
+
+  async getUserQueues(): Promise<UserQueuesData> {
+    const response = await this.api.get('/clients/my-queues');
     return response.data;
   }
 

@@ -25,24 +25,32 @@ export function useClientData() {
 
   const loadClientInfo = useCallback(async () => {
     try {
+      console.log('🔍 useClientData: Carregando dados do cliente do AsyncStorage');
       const stored = await AsyncStorage.getItem('clientInfo');
+      console.log('🔍 useClientData: Dados armazenados:', stored);
+      
       if (stored) {
         const info = JSON.parse(stored);
+        console.log('🔍 useClientData: Dados parseados:', info);
         setClientInfo(info);
         return info;
+      } else {
+        console.log('🔍 useClientData: Nenhum dado encontrado no AsyncStorage');
       }
     } catch (err) {
-      console.error('Erro ao carregar dados do cliente:', err);
+      console.error('❌ useClientData: Erro ao carregar dados do cliente:', err);
     }
     return null;
   }, []);
 
   const saveClientInfo = useCallback(async (info: ClientInfo) => {
     try {
+      console.log('🔍 useClientData: Salvando dados do cliente:', info);
       await AsyncStorage.setItem('clientInfo', JSON.stringify(info));
       setClientInfo(info);
+      console.log('🔍 useClientData: Dados salvos com sucesso');
     } catch (err) {
-      console.error('Erro ao salvar dados do cliente:', err);
+      console.error('❌ useClientData: Erro ao salvar dados do cliente:', err);
     }
   }, []);
 
@@ -101,7 +109,7 @@ export function useClientData() {
     } finally {
       setLoading(false);
     }
-  }, [clientInfo, logout]);
+  }, [clientInfo]); // Apenas clientInfo como dependência
 
   const connectWebSocket = useCallback(() => {
     if (!clientInfo) return;
@@ -148,15 +156,42 @@ export function useClientData() {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  useEffect(() => {
-    loadClientInfo();
-  }, [loadClientInfo]);
+  const fetchUserQueues = useCallback(async () => {
+    if (!clientInfo) return null;
+    
+    try {
+      const isAuth = await authService.isAuthenticated();
+      if (!isAuth) {
+        setError('Sessão expirada. Faça login novamente.');
+        return null;
+      }
+
+      const userQueuesData = await apiService.getUserQueues();
+      return userQueuesData;
+    } catch (err: any) {
+      console.error('Erro ao buscar filas do usuário:', err);
+      if (err.response?.status === 401) {
+        setError('Sessão expirada. Faça login novamente.');
+        await logout();
+      } else {
+        setError(err.response?.data?.message || 'Erro ao carregar filas');
+      }
+      return null;
+    }
+  }, [clientInfo, logout]);
 
   useEffect(() => {
+    console.log('🔍 useClientData: useEffect loadClientInfo executado');
+    loadClientInfo();
+  }, []); // Removido loadClientInfo da dependência para evitar loop
+
+  useEffect(() => {
+    console.log('🔍 useClientData: useEffect clientInfo mudou:', clientInfo);
     if (clientInfo) {
+      console.log('🔍 useClientData: Executando fetchDashboard');
       fetchDashboard();
     }
-  }, [clientInfo, fetchDashboard]);
+  }, [clientInfo]); // Removido fetchDashboard da dependência para evitar loop
 
   useEffect(() => {
     if (clientInfo && tickets.length > 0) {
@@ -179,5 +214,6 @@ export function useClientData() {
     refresh,
     logout,
     fetchDashboard,
+    fetchUserQueues,
   };
 }

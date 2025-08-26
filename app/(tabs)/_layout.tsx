@@ -22,19 +22,30 @@ export default function TabLayout() {
         tabBarInactiveTintColor: '#8E8E93',
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: 'white',
-          borderTopWidth: 1,
-          borderTopColor: '#e1e1e1',
+          backgroundColor: '#007AFF',
+          borderTopWidth: 0,
           height: 90,
           paddingBottom: 30,
           paddingTop: 10,
+          borderRadius: 20,
+          marginHorizontal: 16,
+          marginBottom: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+          elevation: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Minhas Senhas',
-          tabBarIcon: ({ color }) => <TabBarIcon name="receipt-outline" color={color} />,
+          title: 'Guias e Tokens',
+          tabBarIcon: ({ color }) => <TabBarIcon name="key" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -42,6 +53,13 @@ export default function TabLayout() {
         options={{
           title: 'Nova Senha',
           tabBarIcon: ({ color }) => <TabBarIcon name="add-circle-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="test"
+        options={{
+          title: 'Teste',
+          tabBarIcon: ({ color }) => <TabBarIcon name="bug" color={color} />,
         }}
       />
     </Tabs>

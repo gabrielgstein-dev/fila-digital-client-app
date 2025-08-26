@@ -11,31 +11,46 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
 import { useClientData } from '../../hooks/useClientData';
-import { TicketStatus } from '../../types/api';
+import { UserQueuesData } from '../../types/api';
+import { mockUserQueues } from '../../utils/mockData';
 
-export default function DashboardScreen() {
-  const {
-    clientInfo,
-    dashboard,
-    tickets,
-    loading,
-    error,
-    isConnected,
-    refresh,
-    logout,
-  } = useClientData();
-
+export default function QueuesScreen() {
+  const { clientInfo, logout, fetchUserQueues } = useClientData();
+  const [userQueues, setUserQueues] = useState<UserQueuesData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!clientInfo) {
-      router.replace('/(auth)/login');
+    console.log('🔍 QueuesScreen: clientInfo mudou:', clientInfo);
+    
+    if (clientInfo) {
+      console.log('🔍 QueuesScreen: Com clientInfo, carregando filas');
+      loadUserQueues();
     }
   }, [clientInfo]);
 
+  const loadUserQueues = async () => {
+    try {
+      console.log('🔍 QueuesScreen: Iniciando carregamento das filas');
+      setLoading(true);
+      setError(null);
+      
+      // Temporariamente usando dados mock para testar a interface
+      console.log('🔍 QueuesScreen: Usando dados mock');
+      setUserQueues(mockUserQueues);
+      
+    } catch (err: any) {
+      console.error('❌ QueuesScreen: Erro ao carregar filas do usuário:', err);
+    } finally {
+      setLoading(false);
+      console.log('🔍 QueuesScreen: Carregamento concluído');
+    }
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await refresh();
+    await loadUserQueues();
     setRefreshing(false);
   };
 
@@ -50,79 +65,46 @@ export default function DashboardScreen() {
     );
   };
 
-  const getStatusColor = (status: TicketStatus) => {
-    switch (status) {
-      case TicketStatus.WAITING:
-        return '#FF9500';
-      case TicketStatus.CALLED:
-        return '#FF3B30';
-      case TicketStatus.COMPLETED:
-        return '#34C759';
-      default:
-        return '#8E8E93';
-    }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
   };
 
-  const getStatusText = (status: TicketStatus) => {
-    switch (status) {
-      case TicketStatus.WAITING:
-        return 'Aguardando';
-      case TicketStatus.CALLED:
-        return 'Chamado';
-      case TicketStatus.COMPLETED:
-        return 'Atendido';
-      case TicketStatus.SKIPPED:
-        return 'Pulado';
-      case TicketStatus.CANCELLED:
-        return 'Cancelado';
-      default:
-        return status;
-    }
-  };
+  console.log('🔍 QueuesScreen: Renderizando com clientInfo:', clientInfo);
 
-  const formatTime = (minutes: number) => {
-    if (minutes < 60) {
-      return `${Math.round(minutes)}min`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const mins = Math.round(minutes % 60);
-    return `${hours}h ${mins}min`;
-  };
-
+  // Aguarda o clientInfo ser carregado
   if (!clientInfo) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  if (loading && !dashboard) {
+    console.log('🔍 QueuesScreen: Renderizando tela de loading (aguardando clientInfo)');
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Carregando suas senhas...</Text>
+        <Text style={styles.loadingText}>Carregando perfil...</Text>
       </View>
     );
   }
+
+  if (loading) {
+    console.log('🔍 QueuesScreen: Renderizando tela de loading (carregando filas)');
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Carregando suas filas...</Text>
+      </View>
+    );
+  }
+
+  console.log('🔍 QueuesScreen: Renderizando tela principal com dados:', userQueues);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Olá!</Text>
-          <Text style={styles.clientInfo}>
-            {clientInfo.name || clientInfo.phone || clientInfo.email}
-          </Text>
-        </View>
+        <Text style={styles.headerTitle}>Guias e Tokens</Text>
         <View style={styles.headerActions}>
-          <View style={[styles.connectionStatus, { backgroundColor: isConnected ? '#34C759' : '#FF3B30' }]}>
-            <Text style={styles.connectionText}>
-              {isConnected ? 'Online' : 'Offline'}
-            </Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+          <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+            <Ionicons name="refresh" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="filter" size={20} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,76 +121,85 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {dashboard && (
-          <View style={styles.summary}>
-            <Text style={styles.summaryTitle}>Resumo</Text>
-            <View style={styles.summaryGrid}>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryNumber}>{dashboard.summary.totalWaiting}</Text>
-                <Text style={styles.summaryLabel}>Aguardando</Text>
-              </View>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryNumber}>{dashboard.summary.totalCalled}</Text>
-                <Text style={styles.summaryLabel}>Chamadas</Text>
-              </View>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryNumber}>
-                  {dashboard.summary.nextCallEstimate !== Infinity
-                    ? formatTime(dashboard.summary.nextCallEstimate)
-                    : '-'}
-                </Text>
-                <Text style={styles.summaryLabel}>Próxima</Text>
-              </View>
+        {userQueues && (
+          <>
+            <View style={styles.planCard}>
+              <View style={styles.planIndicator} />
+              <Text style={styles.planTitle}>PLANO MÉDICO AMIL</Text>
+              <Text style={styles.planDetails}>AMIL S450 QC NAC R COPART PJ</Text>
             </View>
-          </View>
-        )}
 
-        {tickets.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="receipt-outline" size={64} color="#8E8E93" />
-            <Text style={styles.emptyTitle}>Nenhuma senha ativa</Text>
-            <Text style={styles.emptySubtitle}>
-              Você não possui senhas ativas no momento
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.ticketsContainer}>
-            <Text style={styles.sectionTitle}>Suas Senhas</Text>
-            {tickets.map((ticket) => (
-              <TouchableOpacity
-                key={ticket.id}
-                style={styles.ticketCard}
-                onPress={() => router.push(`/ticket/${ticket.id}`)}
-              >
-                <View style={styles.ticketHeader}>
-                  <View style={styles.ticketNumber}>
-                    <Text style={styles.ticketNumberText}>{ticket.number}</Text>
+            {userQueues.queues.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="list-outline" size={64} color="#8E8E93" />
+                <Text style={styles.emptyTitle}>Nenhuma fila ativa</Text>
+                <Text style={styles.emptySubtitle}>
+                  Você não está em nenhuma fila no momento
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.queuesContainer}>
+                {userQueues.queues.map((queue) => (
+                  <View key={queue.id} style={styles.queueCard}>
+                    {queue.tickets.map((ticket) => (
+                      <View key={ticket.id} style={styles.ticketItem}>
+                        <View style={styles.ticketLeft}>
+                          <View style={styles.ticketIndicator} />
+                          <View style={styles.ticketInfo}>
+                            <Text style={styles.establishmentName}>
+                              {queue.tenant.name.length > 20 
+                                ? `${queue.tenant.name.substring(0, 20)}...` 
+                                : queue.tenant.name}
+                            </Text>
+                            <Text style={styles.serviceType}>EXAMES</Text>
+                            <Text style={styles.orderNumber}>
+                              Pedido: {ticket.number}
+                            </Text>
+                            <Text style={styles.password}>
+                              Senha: {ticket.token}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.ticketRight}>
+                          <View style={styles.validationStatus}>
+                            <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                            <Text style={styles.validatedText}>Validado</Text>
+                          </View>
+                          <Text style={styles.validationDate}>
+                            {ticket.validatedAt ? formatDate(ticket.validatedAt) : formatDate(ticket.createdAt)}
+                          </Text>
+                          <View style={styles.tokenBox}>
+                            <Text style={styles.tokenNumber}>
+                              {ticket.token.replace(/\D/g, '').slice(-6)}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
                   </View>
-                  <View style={styles.ticketInfo}>
-                    <Text style={styles.ticketQueue}>{ticket.queue.name}</Text>
-                    <Text style={styles.ticketTenant}>{ticket.queue.tenant?.name}</Text>
-                  </View>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(ticket.status) }]}>
-                    <Text style={styles.statusText}>{getStatusText(ticket.status)}</Text>
-                  </View>
-                </View>
-                <View style={styles.ticketDetails}>
-                  {ticket.position && (
-                    <Text style={styles.positionText}>
-                      Posição: {ticket.position}
-                    </Text>
-                  )}
-                  {ticket.estimatedTime && (
-                    <Text style={styles.timeText}>
-                      Tempo estimado: {formatTime(ticket.estimatedTime)}
-                    </Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+                ))}
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
+
+      <View style={styles.userProfile}>
+        <View style={styles.profileIcon}>
+          <Ionicons name="person-circle" size={24} color="#8A2BE2" />
+        </View>
+        <View style={styles.profileInfo}>
+          <View style={styles.nameContainer}>
+            <Text style={styles.userName}>
+              {userQueues?.client.name || 'USUÁRIO'}
+            </Text>
+            <View style={styles.statusDot} />
+          </View>
+          <Text style={styles.userType}>
+            {userQueues?.client.userType === 'dependent' ? 'Dependente' : 'Titular'}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -229,40 +220,26 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   header: {
+    backgroundColor: '#007AFF',
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e1e1',
   },
-  greeting: {
-    fontSize: 18,
-    color: '#666',
-  },
-  clientInfo: {
-    fontSize: 24,
+  headerTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: 'white',
   },
   headerActions: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 12,
   },
-  connectionStatus: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  connectionText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  logoutButton: {
+  headerButton: {
     padding: 8,
   },
   errorContainer: {
@@ -280,40 +257,30 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  summary: {
+  planCard: {
     backgroundColor: 'white',
     margin: 16,
-    padding: 20,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  summaryTitle: {
-    fontSize: 18,
+  planIndicator: {
+    width: 4,
+    height: 40,
+    backgroundColor: '#34C759',
+    borderRadius: 2,
+    marginRight: 12,
+  },
+  planTitle: {
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#1a1a1a',
-    marginBottom: 16,
+    marginBottom: 4,
   },
-  summaryGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  summaryNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-  },
-  summaryLabel: {
+  planDetails: {
     fontSize: 12,
     color: '#666',
-    marginTop: 4,
   },
   emptyState: {
     alignItems: 'center',
@@ -340,19 +307,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  ticketsContainer: {
+  queuesContainer: {
     padding: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 16,
-  },
-  ticketCard: {
+  queueCard: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -360,59 +320,124 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  ticketHeader: {
+  ticketItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
-  ticketNumber: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+  ticketLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  ticketIndicator: {
+    width: 4,
+    height: 60,
+    backgroundColor: '#8E8E93',
+    borderRadius: 2,
     marginRight: 12,
-  },
-  ticketNumberText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   ticketInfo: {
     flex: 1,
   },
-  ticketQueue: {
+  establishmentName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1a1a1a',
-  },
-  ticketTenant: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  ticketDetails: {
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingTop: 12,
-  },
-  positionText: {
-    fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
-  timeText: {
+  serviceType: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  orderNumber: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  password: {
+    fontSize: 12,
+    color: '#666',
+  },
+  ticketRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    minHeight: 60,
+  },
+  validationStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  validatedText: {
+    fontSize: 12,
+    color: '#34C759',
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  validationDate: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 8,
+  },
+  tokenBox: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  tokenNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+  },
+  userProfile: {
+    backgroundColor: 'white',
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginRight: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#34C759',
+  },
+  userType: {
     fontSize: 14,
     color: '#666',
   },

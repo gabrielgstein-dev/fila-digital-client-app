@@ -61,14 +61,18 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
+      console.log('🔍 Login: Iniciando processo de login');
       const credentials = {
         cpf: cleanCPF(cpf),
         password: password.trim(),
       };
 
+      console.log('🔍 Login: Credenciais preparadas:', credentials);
       const authResponse = await authService.loginWithCredentials(credentials);
+      console.log('🔍 Login: Resposta da API:', authResponse);
       
       if (authResponse.success && authResponse.user) {
+        console.log('🔍 Login: Login bem-sucedido, salvando dados do cliente');
         const clientInfo = {
           cpf: authResponse.user.cpf,
           name: authResponse.user.name,
@@ -77,7 +81,9 @@ export default function LoginScreen() {
           userType: 'client' as const,
         };
 
+        console.log('🔍 Login: Dados do cliente a serem salvos:', clientInfo);
         await saveClientInfo(clientInfo);
+        console.log('🔍 Login: Dados do cliente salvos com sucesso');
         
         Alert.alert(
           'Sucesso!',
@@ -85,15 +91,19 @@ export default function LoginScreen() {
           [
             {
               text: 'OK',
-              onPress: () => router.replace('/(tabs)'),
+              onPress: () => {
+                console.log('🔍 Login: Usuário clicou OK, redirecionando para (tabs)');
+                router.replace('/(tabs)');
+              },
             },
           ]
         );
       } else {
+        console.log('❌ Login: Falha na autenticação:', authResponse.message);
         Alert.alert('Erro', authResponse.message || 'Erro na autenticação');
       }
     } catch (error: any) {
-      console.error('Erro no login:', error);
+      console.error('❌ Login: Erro no login:', error);
       Alert.alert('Erro', error.message || 'Erro ao realizar login. Verifique suas credenciais.');
     } finally {
       setLoading(false);
@@ -103,7 +113,9 @@ export default function LoginScreen() {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
+      console.log('🔍 Google Login: Iniciando processo de login Google');
       const authResponse = await googleAuthService.signInWithGoogle();
+      console.log('🔍 Google Login: Resposta do Google:', authResponse);
       
       const clientInfo = {
         email: authResponse.user.email,
@@ -112,7 +124,9 @@ export default function LoginScreen() {
         userType: authResponse.user.userType,
       };
 
+      console.log('🔍 Google Login: Dados do cliente a serem salvos:', clientInfo);
       await saveClientInfo(clientInfo);
+      console.log('🔍 Google Login: Dados do cliente salvos com sucesso');
       
       Alert.alert(
         'Login Google realizado! 🎉',
@@ -120,12 +134,15 @@ export default function LoginScreen() {
         [
           {
             text: 'OK',
-            onPress: () => router.replace('/(tabs)'),
+            onPress: () => {
+              console.log('🔍 Google Login: Usuário clicou OK, redirecionando para (tabs)');
+              router.replace('/(tabs)');
+            },
           },
         ]
       );
     } catch (error: any) {
-      console.error('Erro no login Google:', error);
+      console.error('❌ Google Login: Erro no login Google:', error);
       Alert.alert(
         'Erro no Login Google',
         error.message || 'Erro ao realizar login com Google. Tente novamente.'
